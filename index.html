@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6b45"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Ranch Worker">
+<title>Ngapori Ranch Worker App</title>
+<style>
+:root{--bg:#f1f4ef;--card:#fff;--ink:#15201a;--mute:#5a695f;--line:#cdd7cd;--acc:#1f6b45;--accs:#dcecdf;--onacc:#fff;--warn:#b45309;--warns:#ffedd5;--amber:#fde68a;--amberi:#5b3a00;--bad:#b3261e;--bads:#fde4e1;--rib:30px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1712;--card:#18231c;--ink:#e8f0ea;--mute:#98aa9e;--line:#2c3d32;--acc:#58c08a;--accs:#1d3a2a;--onacc:#06180e;--warn:#fbbf24;--warns:#3a2a0b;--amber:#7a5a00;--amberi:#fff3c4;--bad:#ff8a80;--bads:#3d1c19;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}body{background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:manipulation;padding-top:calc(var(--rib) + env(safe-area-inset-top,0px))}
+.hidden{display:none!important}.k{color:var(--mute);font-size:14px}
+.rib{position:fixed;top:0;left:0;right:0;z-index:50;height:calc(var(--rib) + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 12px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;font:700 13px/1 system-ui,sans-serif;letter-spacing:.3px;color:#fff}
+.rib.ok{background:#1b8a4b}.rib.warn{background:#d97706}.rib .s{font-weight:500;opacity:.95;font-size:12px}.rib.pulse{animation:pu .6s}@keyframes pu{from{filter:brightness(1.5)}to{filter:none}}
+.screen{max-width:560px;margin:0 auto;padding:14px 14px calc(92px + env(safe-area-inset-bottom,0px))}
+h1{font-size:26px;margin:6px 0 2px}h2{font-size:21px;margin:0 0 6px;line-height:1.2}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input{font:inherit;width:100%;min-height:54px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}input:focus{outline:3px solid var(--acc);border-color:var(--acc)}
+.btn{display:block;width:100%;min-height:62px;border:0;border-radius:14px;font:800 19px/1.1 system-ui,sans-serif;letter-spacing:.3px;padding:14px;margin-top:10px;background:var(--acc);color:var(--onacc);cursor:pointer}
+.btn:active{transform:scale(.985)}.btn:disabled{opacity:.45}.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);min-height:50px;font-size:16px}
+.btn.pause{background:var(--warn);color:#fff}.btn.submit{background:#0f4d8a;color:#fff}.btn.sm{min-height:46px;font-size:15px;margin-top:6px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 12px}.top b{font-size:18px}.top button{width:auto;min-height:42px;padding:0 14px;margin:0;font-size:14px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{flex:1;min-height:64px;border:0;background:none;color:var(--mute);font:700 14px system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.tabs button span{font-size:22px}.tabs button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+.amber{background:var(--amber);color:var(--amberi);border-radius:12px;padding:12px 14px;margin-bottom:12px;border:2px solid var(--warn)}
+.tag{display:inline-block;background:var(--accs);color:var(--acc);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;margin-bottom:6px}.tag.due{background:var(--warns);color:var(--warn);margin-left:6px}
+.brief{background:var(--bg);border-left:5px solid var(--acc);border-radius:8px;padding:10px 12px;margin:10px 0}
+.zone{border:2px dashed var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;font-size:15px}
+.timer{font:800 56px/1 ui-monospace,Menlo,Consolas,monospace;text-align:center;margin:14px 0 2px;letter-spacing:1px}.tstate{text-align:center;font-weight:700;margin-bottom:6px}
+.run{color:var(--acc)}.paused{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{min-height:46px;min-width:52px;padding:0 14px;border-radius:99px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:700 16px system-ui,sans-serif}.chip.on{background:var(--acc);color:var(--onacc);border-color:var(--acc)}.chip.done{opacity:.5;text-decoration:line-through}
+.kp{border:2px solid var(--acc);border-radius:14px;padding:10px;margin-top:12px}.kpd{display:flex;justify-content:space-between;align-items:baseline;font:800 40px ui-monospace,Menlo,monospace;padding:4px 10px}.kpd .u{font:700 18px system-ui;color:var(--acc)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.keys button{min-height:58px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:800 24px system-ui,sans-serif}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+.badge{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;background:var(--accs);color:var(--acc);white-space:nowrap}.badge.w{background:var(--warns);color:var(--warn)}.badge.b{background:var(--bads);color:var(--bad)}
+.seg{display:flex;gap:6px;margin-bottom:12px}.seg button{flex:1;min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 15px system-ui,sans-serif}.seg button.on{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);display:flex;flex-direction:column;justify-content:flex-end}.modal .in{background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:88vh;overflow:auto}
+#scan{background:#000;justify-content:flex-start}#scan .in{background:#000;color:#fff;border-radius:0;height:100%;display:flex;flex-direction:column;padding-top:calc(var(--rib) + 8px + env(safe-area-inset-top,0px))}
+#sv{width:100%;flex:1;min-height:0;object-fit:cover;border-radius:14px;background:#111}#smsg{min-height:52px;padding:10px 4px;font-weight:700;font-size:17px}#smsg.good{color:#6ee7a0}#smsg.bad{color:#ff9b93}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:120;background:#222;color:#fff;border-radius:12px;padding:12px 14px;font-size:15px;text-align:center}
+.rs{display:grid;gap:10px}.rs button{min-height:68px;font:800 20px system-ui;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);text-align:left;padding:0 16px}.rs button.st{border-color:var(--warn)}
+</style></head><body>
+<div id="rib" class="rib ok" role="status" aria-live="polite"><span id="ribt">● CONNECTED &amp; REFRESHED</span><span class="s" id="ribs"></span></div>
+
+<div id="login" class="screen hidden">
+  <h1>🌱 Ngapori Ranch</h1><p class="k">Worker App · sign in with your username and PIN</p>
+  <div class="card"><div id="lmsg" class="amber hidden"></div>
+    <label for="lu">Username</label><input id="lu" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="e.g. lisa">
+    <label for="lp">PIN</label><input id="lp" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password" placeholder="numbers only">
+    <button class="btn" id="lgo">SIGN IN</button>
+    <p class="k" style="margin-bottom:0">No signal? You can still sign in on a phone you have used before.</p></div>
+</div>
+
+<div id="app" class="screen hidden">
+  <div class="top"><div><b id="who"></b><div class="k" id="role"></div></div><button class="btn ghost" data-a="signout">Sign out</button></div>
+  <div id="view"></div>
+</div>
+<nav class="tabs hidden" id="tabs"><button data-tab="task" class="on"><span>⏱️</span>Task</button><button data-tab="trays"><span>🌱</span>Trays</button><button data-tab="log"><span>📋</span>Log</button></nav>
+
+<div id="scan" class="modal hidden"><div class="in">
+  <div style="font:800 20px system-ui" id="stitle"></div><div class="k" id="shint" style="color:#aaa;margin-bottom:8px"></div>
+  <video id="sv" playsinline muted></video><div id="smsg"></div>
+  <form id="sman" class="hidden" style="display:flex;gap:8px"><input id="smi" placeholder="Type the code" autocapitalize="characters" style="min-height:50px"><button class="btn sm" style="width:auto;margin:0;padding:0 18px">USE</button></form>
+  <button class="btn ghost sm" id="scx" style="color:#fff;border-color:#555">Cancel</button>
+</div></div>
+<div id="sheet" class="modal hidden"><div class="in" id="sbody"></div></div>
+<div id="toast" class="hidden"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz7qyhFT5BRUpiqLCnjtT8gRX-UQ-I0lQhF__H6dgCU_Rql2WFOMuNm-YLXazi0Zrir_g/exec"; // same /exec URL as the engine
+const JSQR_URL = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"; // only loaded on phones without a built-in QR reader
+const REASONS = [["Break","☕","Break"],["Lunch","🍎","Lunch"],["Material/Equipment Stall","🚧","Material / Equipment Stall"],["End of Day","🌙","End of Day"]];
+const UNITS = ["trays","flats","plants","seeds","cells","bags","lbs","beds","units"];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+const pad = n => String(n).padStart(2, "0");
+const fmtDur = s => `${pad(Math.floor(s / 3600))}:${pad(Math.floor(s % 3600 / 60))}:${pad(s % 60)}`;
+const fmtTime = t => new Date(t).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+const fmtShort = t => new Date(t).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+
+/* ---- SHA-256 (pure JS so offline PIN checks work on any browser) ---- */
+const SHA_K = new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+function sha256(str) {
+  const m = new TextEncoder().encode(str), l = m.length, n = ((l + 9 + 63) >> 6) << 6, b = new Uint8Array(n); b.set(m); b[l] = 0x80;
+  const dv = new DataView(b.buffer); dv.setUint32(n - 4, (l * 8) >>> 0); dv.setUint32(n - 8, Math.floor(l * 8 / 4294967296));
+  let h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]; const w = new Uint32Array(64), R = (x, k) => (x >>> k) | (x << (32 - k));
+  for (let o = 0; o < n; o += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+    for (let i = 16; i < 64; i++) { const a = w[i-15], c = w[i-2]; w[i] = (w[i-16] + (R(a,7) ^ R(a,18) ^ (a >>> 3)) + w[i-7] + (R(c,17) ^ R(c,19) ^ (c >>> 10))) >>> 0; }
+    let [a, b2, c, d, e, f, g, hh] = h;
+    for (let i = 0; i < 64; i++) { const t1 = (hh + (R(e,6) ^ R(e,11) ^ R(e,25)) + ((e & f) ^ (~e & g)) + SHA_K[i] + w[i]) >>> 0, t2 = ((R(a,2) ^ R(a,13) ^ R(a,22)) + ((a & b2) ^ (a & c) ^ (b2 & c))) >>> 0; hh = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b2; b2 = a; a = (t1 + t2) >>> 0; }
+    h = [h[0]+a, h[1]+b2, h[2]+c, h[3]+d, h[4]+e, h[5]+f, h[6]+g, h[7]+hh].map(x => x >>> 0);
+  }
+  return h.map(x => x.toString(16).padStart(8, "0")).join("");
+}
+function pinHash(salt, id, pin) { let x = sha256(salt + ":" + id + ":" + pin); for (let i = 0; i < 500; i++) x = sha256(x + ":" + salt); return x; }
+
+/* ---- Storage: one store per worker, so a shared phone never mixes two people's queues ---- */
+const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const emptyStore = () => ({tasks:[], runs:[], board:[], log:[], queue:[], pendingLog:[], trayHist:[], drafts:{}, waveSel:{}, cfg:{qrRequired:true, qrManual:false}, offset:0, synced:0, focus:null});
+let SESS = LS.get("pw_sess", null), S = SESS ? Object.assign(emptyStore(), LS.get("pw_u_" + SESS.id, {})) : null;
+const save = () => { if (SESS) { LS.set("pw_sess", SESS); LS.set("pw_u_" + SESS.id, S); } };
+let ONLINE = navigator.onLine, LAST = 0, MUT = 0, PIN_MEM = null, TAB = "task", SEG = "live", SHEET = null, TR = {runId:null, wave:null, codes:[], dest:null};
+const nowS = () => Date.now() + (S ? S.offset || 0 : 0);
+
+/* ---- Connection ribbon ---- */
+function ribbon(pulse) {
+  const q = S ? S.queue.length : 0, bad = !ONLINE || q > 0, el = $("rib");
+  el.className = "rib " + (bad ? "warn" : "ok");
+  $("ribt").textContent = bad ? "⚠️ SYNCING LOCAL SESSION" : "● CONNECTED & REFRESHED";
+  $("ribs").textContent = bad ? (q ? `${q} saved on this phone` : "No signal · working offline") : (LAST ? "Refreshed " + fmtTime(LAST) : "");
+  if (pulse) { el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); }
+}
+function setOnline(v, pulse) { ONLINE = v; if (v) LAST = Date.now(); ribbon(pulse); }
+let TT; function toast(m) { const t = $("toast"); t.textContent = m; t.classList.remove("hidden"); clearTimeout(TT); TT = setTimeout(() => t.classList.add("hidden"), 3800); }
+
+/* ---- API ---- */
+async function api(body, ms = 20000) {
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms); let r, j;
+  const net = e => Object.assign(new Error("No connection"), {net:true});
+  try { r = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), signal:ctl.signal}); j = await r.json(); } catch (e) { throw net(e); } finally { clearTimeout(to); }
+  if (j.error) throw Object.assign(new Error(j.error), {auth:/^AUTH:/.test(j.error)});
+  return j;
+}
+
+/* ---- Sign-in (online, or offline on a phone that has signed this person in before) ---- */
+function showLogin(msg) { $("login").classList.remove("hidden"); $("app").classList.add("hidden"); $("tabs").classList.add("hidden"); const m = $("lmsg"); m.textContent = msg || ""; m.classList.toggle("hidden", !msg); if (SESS) $("lu").value = SESS.id; $("lp").value = ""; ribbon(); }
+function enter(id, name, role, token) {
+  SESS = {id, name, role, token}; S = Object.assign(emptyStore(), LS.get("pw_u_" + id, {})); save();
+  $("login").classList.add("hidden"); $("app").classList.remove("hidden"); $("tabs").classList.remove("hidden");
+  $("who").textContent = name; $("role").textContent = role || "Worker"; TAB = "task"; setTabs(); render(); ribbon(); sync();
+}
+async function login() {
+  const id = $("lu").value.trim(), pin = $("lp").value.trim(), btn = $("lgo");
+  if (!id || !/^\d{3,12}$/.test(pin)) return showLogin("Enter your username and your numeric PIN.");
+  btn.disabled = true; btn.textContent = "SIGNING IN…";
+  try {
+    const j = await api({action:"login", workerId:id, pin, app:"prop_workerapp", device:navigator.userAgent.slice(0, 200)}); setOnline(true, true);
+    const creds = LS.get("pw_creds", {}), salt = uid(); creds[id] = {name:j.user.name, role:j.user.role, salt, hash:pinHash(salt, id, pin)}; LS.set("pw_creds", creds);
+    PIN_MEM = null; enter(id, j.user.name, j.user.role, j.token);
+  } catch (e) {
+    if (e.net) {
+      setOnline(false); const c = LS.get("pw_creds", {})[id];
+      if (c && c.hash === pinHash(c.salt, id, pin)) { PIN_MEM = pin; enter(id, c.name, c.role, null); }
+      else showLogin(c ? "PIN is not correct." : "No signal, and this phone has not signed you in before. Sign in once where there is coverage.");
+    } else showLogin("Username or PIN is not correct.");
+  } finally { btn.disabled = false; btn.textContent = "SIGN IN"; }
+}
+async function tryToken() { // after an offline sign-in, get a real session once the signal is back
+  if (!PIN_MEM) return needLogin("Sign in again to send the work saved on this phone.");
+  try { const j = await api({action:"login", workerId:SESS.id, pin:PIN_MEM, app:"prop_workerapp", device:navigator.userAgent.slice(0, 200)}); SESS.token = j.token; PIN_MEM = null; save(); setOnline(true); }
+  catch (e) { if (e.net) setOnline(false); else { PIN_MEM = null; needLogin("PIN was not accepted. Sign in again."); } }
+}
+function needLogin(msg) { if (SESS) { SESS.token = null; save(); } showLogin(msg || "Your session ended. Sign in again, your saved work is kept."); }
+async function signout() {
+  const q = S.queue.length; if (q && !confirm(`${q} event${q > 1 ? "s are" : " is"} not sent yet. They stay on this phone and send when you sign in again with signal. Sign out?`)) return;
+  const tok = SESS.token; if (tok) { try { await api({action:"logout", token:tok, app:"prop_workerapp"}, 6000); } catch (e) {} }
+  save(); SESS = null; S = null; LS.set("pw_sess", null); showLogin();
+}
+
+/* ---- Sync: queue of local events first, then one read ---- */
+const ACTION = {start:"wStart", pause:"wPause", resume:"wResume", close:"wClose", tray:"wTray"};
+function push(q) { S.queue.push(q); MUT++; save(); ribbon(); }
+function remap(localId, realId) {
+  S.tasks.forEach(t => { if (t.session && t.session.id === localId) t.session.id = realId; });
+  S.queue.forEach(q => { if (q.ref === localId) q.ref = realId; });
+}
+async function flush() {
+  while (S.queue.length && SESS.token) {
+    const q = S.queue[0];
+    try {
+      const body = Object.assign({}, q.body, {action:ACTION[q.t], token:SESS.token, at:q.at, cid:q.cid}); if (q.ref) body.sessionId = q.ref;
+      const r = await api(body); setOnline(true, true);
+      if (q.t === "start") remap(q.localId, r.sessionId);
+      S.queue.shift(); MUT++; save();
+    } catch (e) {
+      if (e.net) { setOnline(false); return; }
+      if (e.auth) return needLogin();
+      S.queue.shift(); MUT++; // the server refused it: drop it, tell the worker, and let the next read show the truth
+      if (q.t === "start") S.queue = S.queue.filter(x => x.ref !== q.localId);
+      S.rejects = (S.rejects || []).concat(e.message); toast("Not saved: " + e.message); save();
+    }
+  }
+}
+let SYNCING = false;
+async function sync() {
+  if (!SESS || SYNCING) return; SYNCING = true;
+  try {
+    if (!SESS.token) { await tryToken(); if (!SESS || !SESS.token) return; }
+    await flush(); if (!SESS || !SESS.token || S.queue.length) return;
+    const m = MUT, d = new Date(); d.setHours(0, 0, 0, 0);
+    const j = await api({action:"wSync", token:SESS.token, since:d.toISOString()}); setOnline(true);
+    if (m !== MUT) return; // the worker tapped something while this was loading: keep their newer local state
+    S.offset = j.now - Date.now(); S.tasks = j.tasks; S.runs = j.runs; S.board = j.board; S.log = j.log; S.cfg = j.config; S.pendingLog = []; S.synced = Date.now(); save(); render();
+  } catch (e) { if (e.net) setOnline(false); else if (e.auth) needLogin(); else toast(e.message); }
+  finally { SYNCING = false; ribbon(); }
+}
+const kick = () => setTimeout(sync, 0), touch = () => { if (SESS && ONLINE && Date.now() - LAST > 4000) sync(); };
+
+/* ---- Task helpers ---- */
+const elapsedAt = (s, at) => { let e = (at - Date.parse(s.startedAt)) / 1000 - (s.pausedSec || 0); if (s.pausedAt) e -= (at - Date.parse(s.pausedAt)) / 1000; return Math.max(0, Math.floor(e)); };
+const elapsedSec = s => elapsedAt(s, nowS());
+function cur() {
+  const ts = S.tasks; if (!ts.length) return null;
+  return ts.find(t => t.session && !t.session.pausedAt) || ts.find(t => t.key === S.focus) || ts.find(t => t.session) || ts.find(t => !t.locked) || ts[0];
+}
+const draft = t => S.drafts[t.key] = S.drafts[t.key] || {qty:"", unit:"", last:undefined};
+function nextWave(t) { const sel = S.waveSel[t.key]; if (sel) return sel; for (let w = 1; w <= t.waves; w++) if (!t.doneWaves.includes(w)) return w; return t.waves; }
+function isLastWave(t) { const dr = draft(t); if (dr.last !== undefined) return dr.last; const done = new Set(t.doneWaves.concat(t.session ? [t.session.wave] : [])); for (let w = 1; w <= t.waves; w++) if (!done.has(w)) return false; return true; }
+
+/* ---- Zone rule (same logic as the server, so it works with no signal) ---- */
+const zNorm = s => String(s == null ? "" : s).toUpperCase().replace(/\s+/g, "").replace(/^ZONE[:|]/, "");
+function zoneOk(scan, z) {
+  const s = zNorm(scan); if (!s || !z) return false; if ((z.codes || []).includes(s)) return true;
+  const m = /^([A-Z]+\d*-)(\d+)$/.exec(s); if (!m) return false; const n = +m[2];
+  return (z.ranges || []).some(r => r.p === m[1] && n >= r.a && n <= r.b) || (z.any || []).includes(m[1]);
+}
+
+/* ---- QR scanner: built-in reader where the phone has one, jsQR where it does not ---- */
+const SC = {res:null, on:null, multi:false, stream:null, det:null, tm:0, last:"", lastAt:0};
+function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+function scanMsg(cls, t) { const e = $("smsg"); e.className = cls; e.textContent = t; }
+function stopCam() { clearTimeout(SC.tm); if (SC.stream) SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; $("sv").srcObject = null; }
+function scanEnd(v) { stopCam(); $("scan").classList.add("hidden"); const r = SC.res; SC.res = null; if (r) r(v); }
+function gotCode(raw, mode) {
+  const now = Date.now(); if (mode === "qr" && raw === SC.last && now - SC.lastAt < 1500) return; SC.last = raw; SC.lastAt = now;
+  const r = SC.on(String(raw).trim(), mode) || {}; scanMsg(r.ok ? "good" : "bad", r.msg || ""); if (navigator.vibrate) navigator.vibrate(r.ok ? 60 : [80, 60, 80]);
+  if (r.ok && !SC.multi) scanEnd({code:String(raw).trim(), mode});
+}
+async function scanLoop() {
+  if (!SC.res) return;
+  try {
+    const v = $("sv"); let val = null;
+    if (v.readyState >= 2) {
+      if (SC.det) { const b = await SC.det.detect(v); if (b.length) val = b[0].rawValue; }
+      else if (window.jsQR) { const c = SC.cv || (SC.cv = document.createElement("canvas")), w = Math.min(640, v.videoWidth), h = Math.round(w * v.videoHeight / v.videoWidth); c.width = w; c.height = h; const x = c.getContext("2d", {willReadFrequently:true}); x.drawImage(v, 0, 0, w, h); const q = jsQR(x.getImageData(0, 0, w, h).data, w, h); if (q) val = q.data; }
+      if (val) gotCode(val, "qr");
+    }
+  } catch (e) {}
+  SC.tm = setTimeout(scanLoop, 150);
+}
+function scanner({title, hint, multi, onCode}) {
+  $("stitle").textContent = title; $("shint").textContent = hint || ""; $("scx").textContent = multi ? "Done" : "Cancel"; scanMsg("", ""); $("smi").value = "";
+  $("sman").classList.toggle("hidden", !S.cfg.qrManual); $("scan").classList.remove("hidden"); SC.on = onCode; SC.multi = !!multi; SC.last = "";
+  return new Promise(async res => {
+    SC.res = res;
+    try {
+      SC.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}, audio:false}); $("sv").srcObject = SC.stream; await $("sv").play();
+      if ("BarcodeDetector" in window) { try { SC.det = new BarcodeDetector({formats:["qr_code"]}); } catch (e) {} }
+      if (!SC.det && !window.jsQR) await loadScript(JSQR_URL);
+      scanLoop();
+    } catch (e) { scanMsg("bad", "The camera is not available." + (S.cfg.qrManual ? " Type the code below." : " Ask your manager if manual entry can be switched on.")); }
+  });
+}
+$("scx").onclick = () => scanEnd(SC.multi ? true : null);
+$("sman").onsubmit = e => { e.preventDefault(); const v = $("smi").value.trim(); if (v && S.cfg.qrManual) { gotCode(v, "manual"); $("smi").value = ""; } };
+const scanZone = (t, title) => scanner({title:title || "Scan the zone QR to start", hint:"Required zone: " + t.zone.label, onCode: (c, mode) =>
+  zoneOk(c, t.zone) && (mode !== "manual" || S.cfg.qrManual) ? {ok:true, msg:"✓ Zone verified"} : {ok:false, msg:`✗ Wrong zone (${c}). This task is for ${t.zone.label}.`}});
+
+/* ---- Views ---- */
+function viewTask() {
+  const t = cur();
+  if (!t) return `<div class="card"><h2>No task assigned</h2><p class="k">Nothing is assigned to you right now.${S.synced ? " Last checked " + fmtTime(S.synced) + "." : ""}</p><button class="btn ghost" data-a="refresh">↻ Check again</button></div>`;
+  const s = t.session, st = s ? (s.pausedAt ? "paused" : "running") : "ready", dr = draft(t), cnt = t.requiresCount && s, blocked = cnt && !(Number(dr.qty) > 0 && dr.unit);
+  const others = S.tasks.filter(x => x !== t);
+  return `<div class="card">
+    ${t.reassigned ? `<div class="amber"><b>🔄 Reassigned from ${esc(t.reassigned.from || "another worker")} to ${esc(t.reassigned.to)} by ${esc(t.reassigned.by || "manager")}.</b></div>` : ""}
+    <span class="tag">${esc((t.phase || "").split(":")[0] || t.scope)}</span>${t.due ? `<span class="tag due">Due ${esc(String(t.due).slice(0, 10))}</span>` : ""}
+    <h2>${esc(t.activityId)} · ${esc(t.name)}</h2>
+    <div class="k">${esc(t.cropName)} (${esc(t.crop)}) · ${t.platform === "F" ? "Field" : "Greenhouse"} · Wave ${s ? s.wave : nextWave(t)} of ${t.waves}</div>
+    <div class="brief"><b>${esc(t.activityId)}:</b> ${esc(t.description)}<div class="k">${esc(t.timing)}</div></div>
+    <div class="zone">📍 <b>Zone:</b> ${esc(t.zone.label)}${S.cfg.qrRequired ? `<div class="k">📷 Scan the zone QR to start and again to submit.</div>` : ""}</div>
+    ${!s && t.waves > 1 ? `<div class="k">Which wave?</div><div class="chips">${Array.from({length:t.waves}, (_, i) => i + 1).map(w => `<button class="chip ${nextWave(t) === w ? "on" : ""} ${t.doneWaves.includes(w) ? "done" : ""}" data-a="wave" data-k="${w}">${w}</button>`).join("")}</div>` : ""}
+    <div class="timer ${st === "running" ? "run" : st === "paused" ? "paused" : ""}" id="timer">${fmtDur(s ? elapsedSec(s) : 0)}</div>
+    <div class="tstate">${st === "running" ? "● Working" : st === "paused" ? "⏸ Paused · " + esc(s.pauseReason) : t.locked ? "🔒 Waiting for the manager to verify the gate activities" : "Ready to start"}</div>
+    ${st === "ready" ? `<button class="btn" data-a="start" ${t.locked ? "disabled" : ""}>▶ START WORK</button>` : ""}
+    ${st === "running" ? `<button class="btn pause" data-a="pause">⏸ PAUSE ACTIVITY</button>` : ""}
+    ${st === "paused" ? `<button class="btn" data-a="resume">▶ RESUME</button>` : ""}
+    ${cnt ? `<div class="kp"><div class="k" style="padding:0 6px">Quantity and unit are required to submit</div><div class="kpd"><span>${esc(dr.qty || "0")}</span><span class="u">${esc(dr.unit || "pick unit")}</span></div>
+      <div class="keys">${["1","2","3","4","5","6","7","8","9",".","0","⌫"].map(k => `<button data-a="key" data-k="${k}">${k}</button>`).join("")}</div>
+      <div class="chips">${UNITS.map(u => `<button class="chip ${dr.unit === u ? "on" : ""}" data-a="unit" data-k="${u}">${u}</button>`).join("")}</div></div>` : ""}
+    ${s && t.waves > 1 ? `<div class="chips"><button class="chip ${isLastWave(t) ? "on" : ""}" data-a="last">${isLastWave(t) ? "☑" : "☐"} Last wave for this activity</button></div>` : ""}
+    ${s ? `<button class="btn submit" data-a="submit" ${blocked ? "disabled" : ""}>${blocked ? "🔒 " : ""}SUBMIT TASK</button>` : ""}
+  </div>
+  ${others.length ? `<div class="k" style="margin:4px 4px 8px">Also assigned to you (${others.length})</div><div class="card" style="padding:6px 16px">${others.map(o => `<div class="row" ${o.locked ? "" : `data-a="focus" data-k="${esc(o.key)}"`} style="cursor:pointer"><div><b>${esc(o.activityId)} · ${esc(o.name)}</b><div class="k">${esc(o.cropName)} · ${esc(o.zone.label)}</div></div><span class="badge ${o.locked ? "w" : ""}">${o.locked ? "🔒 locked" : o.session ? "open" : "open ›"}</span></div>`).join("")}</div>` : ""}`;
+}
+function viewTrays() {
+  const run = TR.runId && S.runs.find(r => r.runId === TR.runId), need = S.cfg.qrRequired, ready = TR.codes.length && (!need || TR.dest);
+  return `<div class="card"><h2>Move trays out of Bay 3</h2><p class="k">Scan each tray tag as you carry it out, then scan the destination zone.</p>
+    ${run ? `<div class="brief"><b>${esc(run.cropName)}</b> (${esc(run.crop)}) · Wave ${TR.wave}<br><span class="mono">${TR.codes.length}</span> of ${run.traysPerWave} trays scanned<div class="k">Goes to: ${esc(run.zone.label)}</div></div>` : ""}
+    <button class="btn" data-a="trayscan">📷 SCAN TRAY TAGS</button>
+    ${need ? `<button class="btn ghost" data-a="traydest" ${TR.codes.length ? "" : "disabled"}>${TR.dest ? "✓ Destination " + esc(TR.dest.code) : "📍 SCAN DESTINATION ZONE"}</button>` : ""}
+    <button class="btn submit" data-a="traylog" ${ready ? "" : "disabled"}>LOG MOVE${TR.codes.length ? " · " + TR.codes.length + " TRAY" + (TR.codes.length > 1 ? "S" : "") : ""}</button>
+    ${TR.codes.length ? `<button class="btn ghost sm" data-a="trayclear">Clear</button>` : ""}</div>
+  ${S.trayHist.length ? `<div class="card"><h2 style="font-size:17px">Recent moves</h2>${S.trayHist.slice(0, 8).map(h => `<div class="row"><div><b>${esc(h.crop)}</b> · wave ${h.wave} · ${h.n} tray${h.n > 1 ? "s" : ""}<div class="k">${esc(h.to)} · ${fmtShort(h.at)}</div></div><span class="badge ${S.queue.some(q => q.cid === h.cid) ? "w" : ""}">${S.queue.some(q => q.cid === h.cid) ? "⏳ on phone" : "✓ sent"}</span></div>`).join("")}</div>` : ""}`;
+}
+function viewLog() {
+  const seg = `<div class="seg"><button data-a="seg" data-k="live" class="${SEG === "live" ? "on" : ""}">Live on farm (${S.board.length})</button><button data-a="seg" data-k="done" class="${SEG === "done" ? "on" : ""}">My completed work</button></div>`;
+  if (SEG === "live") return seg + (S.board.length ? S.board.map(b => `<div class="card"><div class="row" style="padding-top:0"><b>${esc(b.activityId)} · ${esc(b.activity)}</b>${b.pausedAt ? `<span class="badge ${/Stall/.test(b.pauseReason) ? "b" : "w"}">⏸ ${esc(b.pauseReason)}</span>` : `<span class="badge">● working</span>`}</div>
+    <div class="k">${esc(b.worker)}${b.me ? " (you)" : ""} · ${esc(b.crop)} · wave ${b.wave}<br>${esc(b.location)}</div><div class="mono" style="font-size:26px;margin-top:6px" data-live data-st="${esc(b.startedAt)}" data-ps="${b.pausedSec}" data-pa="${esc(b.pausedAt)}">${fmtDur(elapsedSec(b))}</div></div>`).join("") : `<div class="card k">Nobody has an open session right now.</div>`);
+  const items = S.pendingLog.concat(S.log);
+  return seg + (items.length ? `<div class="card" style="padding:6px 16px">${items.map(l => `<div class="row"><div><b>${esc(l.activityId)} · ${esc(l.activity)}</b><div class="k">${esc(l.crop)} · wave ${esc(l.wave)} · ${fmtShort(l.closedAt)} · ${esc(l.minutes)} min net${l.quantity ? " · " + esc(l.quantity) + " " + esc(l.unit) : ""}</div></div>
+    <span class="badge ${l.pending ? "w" : l.verified ? "" : "w"}">${l.pending ? "⏳ on phone" : l.verified ? "✓ verified" : "awaiting check"}</span></div>`).join("")}</div>` : `<div class="card k">No completed work yet today.</div>`);
+}
+function render() {
+  if (!SESS || !S) return; const y = window.scrollY, v = $("view");
+  v.innerHTML = TAB === "task" ? viewTask() : TAB === "trays" ? viewTrays() : viewLog(); window.scrollTo(0, y); tick();
+}
+function setTabs() { document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === TAB)); }
+function tick() {
+  if (!SESS || !S) return; const t = cur(), el = $("timer"); if (el && t && t.session) el.textContent = fmtDur(elapsedSec(t.session));
+  document.querySelectorAll("[data-live]").forEach(e => e.textContent = fmtDur(elapsedSec({startedAt:e.dataset.st, pausedSec:+e.dataset.ps, pausedAt:e.dataset.pa})));
+}
+
+/* ---- Pause sheet ---- */
+function drawSheet() {
+  const sh = $("sheet"); if (!SHEET) return sh.classList.add("hidden"); sh.classList.remove("hidden");
+  $("sbody").innerHTML = SHEET.stall
+    ? `<h2>🚧 Material / Equipment Stall</h2><p class="k">The manager is alerted straight away. What is stopping you?</p><input id="snote" placeholder="e.g. out of peat, hopper jammed" maxlength="200"><button class="btn pause" data-a="stallgo">REPORT STALL &amp; PAUSE</button><button class="btn ghost sm" data-a="sheetx">Back</button>`
+    : `<h2>Pause for…</h2><div class="rs">${REASONS.map((r, i) => `<button class="${i === 2 ? "st" : ""}" data-a="reason" data-k="${i}">${r[1]}  ${r[2]}</button>`).join("")}</div><button class="btn ghost sm" data-a="sheetx">Cancel</button>`;
+}
+
+/* ---- Actions (each updates the phone first, then sends) ---- */
+const ACT = {
+  async start() { const t = cur(); if (!t || t.session || t.locked) return; const wave = nextWave(t); let sc = {code:"", mode:"qr"};
+    if (S.cfg.qrRequired) { sc = await scanZone(t); if (!sc) return; }
+    const cid = uid(), at = nowS(); t.session = {id:"L:" + cid, wave, startedAt:new Date(at).toISOString(), pausedAt:"", pauseReason:"", pausedSec:0}; S.focus = t.key;
+    push({cid, t:"start", at, localId:t.session.id, body:{runId:t.runId, activityId:t.activityId, wave, zoneScan:sc.code, scanMode:sc.mode}}); render(); kick(); },
+  pause() { SHEET = {stall:false}; drawSheet(); },
+  reason(d) { const r = REASONS[+d.k]; if (/Stall/.test(r[0])) { SHEET = {stall:true}; drawSheet(); return; } doPause(r[0], ""); },
+  stallgo() { doPause("Material/Equipment Stall", ($("snote") || {}).value || ""); },
+  sheetx() { SHEET = null; drawSheet(); },
+  resume() { const t = cur(), s = t && t.session; if (!s || !s.pausedAt) return; const at = nowS();
+    s.pausedSec = (s.pausedSec || 0) + Math.max(0, Math.round((at - Date.parse(s.pausedAt)) / 1000)); s.pausedAt = ""; s.pauseReason = "";
+    push({cid:uid(), t:"resume", at, ref:s.id, body:{}}); render(); kick(); },
+  key(d) { const t = cur(), dr = draft(t); let q = dr.qty; if (d.k === "⌫") q = q.slice(0, -1); else if (d.k === "." ? !q.includes(".") && q.length < 7 : q.length < 7) q += d.k; dr.qty = q.replace(/^0+(\d)/, "$1"); save(); render(); },
+  unit(d) { draft(cur()).unit = d.k; save(); render(); },
+  last() { const t = cur(), dr = draft(t); dr.last = !isLastWave(t); save(); render(); },
+  wave(d) { const t = cur(); S.waveSel[t.key] = +d.k; save(); render(); },
+  focus(d) { const run = S.tasks.find(t => t.session && !t.session.pausedAt); if (run) return toast("Pause or submit the running task first."); S.focus = d.k; save(); render(); },
+  async submit() { const t = cur(), s = t && t.session; if (!s) return; const dr = draft(t);
+    if (t.requiresCount && !(Number(dr.qty) > 0 && dr.unit)) return toast("Enter the quantity and pick a unit first.");
+    let sc = {code:"", mode:"qr"}; if (S.cfg.qrRequired) { sc = await scanZone(t, "Scan the zone QR to submit"); if (!sc) return; }
+    const done = isLastWave(t), at = nowS(), cid = uid(), qty = t.requiresCount ? Number(dr.qty) : "", unit = t.requiresCount ? dr.unit : "";
+    push({cid, t:"close", at, ref:s.id, body:{quantity:qty, unit, completed:done, zoneScan:sc.code, scanMode:sc.mode}});
+    S.pendingLog.unshift({id:cid, activityId:t.activityId, activity:t.name, crop:t.cropName, wave:s.wave, closedAt:new Date(at).toISOString(), minutes:Math.round(elapsedAt(s, at) / 60), quantity:qty, unit, pending:true});
+    if (done) S.tasks = S.tasks.filter(x => x !== t); else { t.doneWaves.push(s.wave); t.session = null; delete S.waveSel[t.key]; }
+    delete S.drafts[t.key]; S.focus = null; render(); kick(); toast(done ? "Task submitted." : "Wave " + s.wave + " submitted. The task stays open for the next wave."); },
+  refresh() { sync(); },
+  seg(d) { SEG = d.k; render(); },
+  signout() { signout(); },
+  /* trays */
+  async trayscan() {
+    await scanner({title:"Scan tray tags", hint:"Scan each tray as you carry it out. Tap Done when finished.", multi:true, onCode: code => {
+      const m = /^TRAY\|([A-Za-z0-9-]+)\|W(\d+)\|(\d+)$/.exec(code); if (!m) return {ok:false, msg:"✗ That is not a tray tag."};
+      const run = S.runs.find(r => r.runId === m[1]); if (!run) return {ok:false, msg:"✗ Unknown run " + m[1] + ". Connect once to refresh, then try again."};
+      if (!run.nursery) return {ok:false, msg:"✗ " + run.cropName + " has no nursery trays."};
+      if (TR.runId && (TR.runId !== m[1] || TR.wave !== +m[2])) return {ok:false, msg:"✗ Different run or wave. Log this move first."};
+      if (+m[3] < 1 || +m[3] > run.traysPerWave) return {ok:false, msg:"✗ Tray " + m[3] + " is not in this wave."};
+      if (TR.codes.includes(code)) return {ok:false, msg:"Already scanned (" + TR.codes.length + " of " + run.traysPerWave + ")."};
+      TR.runId = m[1]; TR.wave = +m[2]; TR.codes.push(code); TR.dest = null; return {ok:true, msg:`✓ Tray ${m[3]} · ${TR.codes.length} of ${run.traysPerWave} · ${run.cropName}`};
+    }}); render(); },
+  async traydest() { const run = S.runs.find(r => r.runId === TR.runId); if (!run) return;
+    const sc = await scanner({title:"Scan the destination zone", hint:"Required: " + run.zone.label, onCode: (c, mode) => zoneOk(c, run.zone) && (mode !== "manual" || S.cfg.qrManual) ? {ok:true, msg:"✓ Destination verified"} : {ok:false, msg:`✗ Wrong destination (${c}). These trays go to ${run.zone.label}.`}});
+    if (sc) { TR.dest = sc; render(); } },
+  traylog() { const run = S.runs.find(r => r.runId === TR.runId); if (!run || !TR.codes.length) return; const cid = uid(), at = nowS();
+    push({cid, t:"tray", at, body:{runId:TR.runId, wave:TR.wave, trays:TR.codes.slice(), toScan:TR.dest ? TR.dest.code : "", toMode:TR.dest ? TR.dest.mode : "qr"}});
+    S.trayHist.unshift({cid, crop:run.cropName, wave:TR.wave, n:TR.codes.length, to:run.zone.label, at}); S.trayHist = S.trayHist.slice(0, 20);
+    TR = {runId:null, wave:null, codes:[], dest:null}; save(); render(); kick(); toast("Tray move saved."); },
+  trayclear() { TR = {runId:null, wave:null, codes:[], dest:null}; render(); }
+};
+function doPause(reason, note) {
+  const t = cur(), s = t && t.session; SHEET = null; drawSheet(); if (!s || s.pausedAt) return; const at = nowS();
+  s.pausedAt = new Date(at).toISOString(); s.pauseReason = reason; push({cid:uid(), t:"pause", at, ref:s.id, body:{reason, note}}); render(); kick();
+  if (/Stall/.test(reason)) toast("Stall reported. Your manager has been alerted.");
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (!b || b.disabled || !ACT[b.dataset.a]) return; touch(); ACT[b.dataset.a](b.dataset); });
+$("tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return; TAB = b.dataset.tab; setTabs(); touch(); render(); });
+$("lgo").onclick = login; $("lp").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+/* ---- Boot ---- */
+window.addEventListener("online", () => { setOnline(true); sync(); }); window.addEventListener("offline", () => setOnline(false));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") sync(); });
+setInterval(tick, 1000); setInterval(() => { if (SESS && document.visibilityState === "visible") sync(); }, 30000);
+(function pwa() {
+  try { const icon = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#1f6b45"/><text x="256" y="350" font-size="290" text-anchor="middle">🌱</text></svg>');
+    const m = {name:"Ngapori Ranch Worker App", short_name:"Ranch Worker", display:"standalone", start_url:location.href.split("#")[0], background_color:"#1f6b45", theme_color:"#1f6b45", icons:[{src:icon, sizes:"any", type:"image/svg+xml"}]};
+    const l = document.createElement("link"); l.rel = "manifest"; l.href = URL.createObjectURL(new Blob([JSON.stringify(m)], {type:"application/manifest+json"})); document.head.appendChild(l);
+    const a = document.createElement("link"); a.rel = "apple-touch-icon"; a.href = icon; document.head.appendChild(a); } catch (e) {}
+  if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+if (SESS && SESS.token) { $("who").textContent = SESS.name; $("role").textContent = SESS.role || "Worker"; $("app").classList.remove("hidden"); $("tabs").classList.remove("hidden"); render(); ribbon(); sync(); }
+else showLogin(SESS ? "Sign in again to continue. Your saved work is kept." : "");
+</script></body></html>
