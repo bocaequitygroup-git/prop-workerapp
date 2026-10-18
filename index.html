@@ -271,6 +271,7 @@ function viewTask() {
     <h2>${esc(t.activityId)} · ${esc(t.name)}</h2>
     <div class="k">${esc(t.cropName)} (${esc(t.crop)}) · ${t.platform === "F" ? "Field" : "Greenhouse"} · Wave ${s ? s.wave : nextWave(t)} of ${t.waves}</div>
     <div class="brief"><b>${esc(t.activityId)}:</b> ${esc(t.description)}<div class="k">${esc(t.timing)}</div></div>
+    ${t.team && t.team.length ? `<div class="k">👥 Also assigned: ${t.team.map(esc).join(", ")}</div>` : ""}
     <div class="zone">📍 <b>Zone:</b> ${esc(t.zone.label)}${S.cfg.qrRequired ? `<div class="k">📷 Scan the zone QR to start and again to submit.</div>` : ""}</div>
     ${!s && t.waves > 1 ? `<div class="k">Which wave?</div><div class="chips">${Array.from({length:t.waves}, (_, i) => i + 1).map(w => `<button class="chip ${nextWave(t) === w ? "on" : ""} ${t.doneWaves.includes(w) ? "done" : ""}" data-a="wave" data-k="${w}">${w}</button>`).join("")}</div>` : ""}
     <div class="timer ${st === "running" ? "run" : st === "paused" ? "paused" : ""}" id="timer">${fmtDur(s ? elapsedSec(s) : 0)}</div>
